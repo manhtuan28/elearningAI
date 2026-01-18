@@ -122,18 +122,63 @@
                 <span>Quản lý nội dung</span>
             </div>
             <h1 class="text-4xl font-black text-slate-900 tracking-tight leading-tight uppercase">{{ $course->title }}</h1>
-            <div class="mt-3 flex items-center gap-4">
-                <span class="px-3 py-1 rounded-lg bg-purple-50 text-purple-700 text-[11px] font-black uppercase border border-purple-100">{{ $course->code ?? 'NO-CODE' }}</span>
-                <span class="text-xs font-bold text-slate-500">{{ $course->chapters->count() }} Chương • {{ $course->chapters->sum(fn($c)=>$c->lessons->count()) }} Bài học</span>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <button @click="importModalOpen = true" class="px-5 py-3 bg-emerald-600 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-emerald-700 transition shadow-lg shadow-emerald-200 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                </svg>
+                Nhập Excel
+            </button>
+
+            <a href="{{ route('instructor.courses.index') }}" class="px-6 py-3 bg-white border border-slate-200 rounded-2xl font-black text-[10px] uppercase tracking-widest text-slate-500 hover:text-purple-600 hover:border-purple-200 transition shadow-sm flex items-center gap-2">
+                &larr; Quay lại
+            </a>
+        </div>
+    </div>
+
+    <div x-show="importModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm" style="display: none;" x-transition>
+        <div class="bg-white rounded-[2.5rem] w-full max-w-xl shadow-2xl overflow-hidden">
+            <div class="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <h3 class="font-black text-xl text-slate-800 uppercase tracking-tight">Nhập nội dung từ Excel</h3>
+                <button @click="importModalOpen = false" class="text-slate-400 hover:text-red-500 transition">✕</button>
+            </div>
+            <div class="p-8">
+                <form action="{{ route('instructor.courses.import', $course->id) }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+
+                    <div class="mb-6 p-5 bg-blue-50 rounded-2xl border border-blue-100 text-blue-800 text-xs font-medium leading-loose">
+                        <p class="font-bold text-sm mb-2">📋 Hướng dẫn nhập liệu:</p>
+                        <ul class="list-disc pl-4 space-y-1">
+                            <li><strong>Chương:</strong> Chỉ điền cột 'ten_chuong' (các cột khác để trống).</li>
+                            <li><strong>Bài học:</strong> Điền 'ten_bai_hoc' (để trống 'ten_chuong'). Hệ thống sẽ tự gán vào chương gần nhất bên trên.</li>
+                            <li><strong>Quiz:</strong> Nhập câu hỏi vào cột 'noi_dung' theo cú pháp:<br>
+                                <code class="bg-white px-1 py-0.5 rounded border border-blue-200">Câu hỏi? | Đáp án 1 | *Đáp án đúng | Đáp án 3</code>
+                            </li>
+                            <li><a href="{{ route('instructor.courses.import_template') }}" class="underline font-black text-blue-600 hover:text-blue-800">👉 Tải file mẫu tại đây</a></li>
+                        </ul>
+                    </div>
+
+                    <label class="block text-[10px] font-black text-slate-400 uppercase mb-3 tracking-widest">Chọn file Excel (.xlsx, .csv)</label>
+                    <input type="file" name="excel_file" required accept=".xlsx, .xls, .csv" class="block w-full text-xs text-slate-500 file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-xs file:font-black file:bg-slate-800 file:text-white hover:file:bg-black transition cursor-pointer bg-slate-50 rounded-xl border border-slate-200">
+
+                    <button type="submit" class="mt-8 w-full bg-emerald-600 text-white py-4 rounded-2xl font-black uppercase text-xs tracking-[0.2em] hover:bg-emerald-700 transition shadow-xl shadow-emerald-200">
+                        Xác nhận nhập
+                    </button>
+                </form>
             </div>
         </div>
-        <a href="{{ route('instructor.courses.index') }}" class="px-6 py-3 bg-white border border-slate-200 rounded-2xl font-black text-[10px] uppercase tracking-widest text-slate-500 hover:text-purple-600 hover:border-purple-200 transition shadow-sm flex items-center gap-2">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-            </svg>
-            Quay lại
-        </a>
     </div>
+
+    @if(session('error'))
+    <div class="mb-8 p-4 bg-red-50 text-red-700 rounded-2xl font-bold border border-red-100 flex items-center gap-3 shadow-sm">
+        <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        {{ session('error') }}
+    </div>
+    @endif
 
     @if(session('success'))
     <div class="mb-8 p-4 bg-emerald-50 text-emerald-700 rounded-2xl font-bold border border-emerald-100 flex items-center gap-3 shadow-sm">
@@ -266,6 +311,40 @@
                         <button type="submit" class="bg-purple-600 text-white px-6 rounded-xl font-bold text-xs uppercase hover:bg-purple-700 transition">Lưu</button>
                         <button type="button" @click="open = false" class="px-4 text-slate-400 font-bold text-xs hover:text-slate-600">Hủy</button>
                     </form>
+                </div>
+
+                <div x-show="importModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm" style="display: none;" x-transition>
+                    <div class="bg-white rounded-[2.5rem] w-full max-w-lg shadow-2xl overflow-hidden">
+                        <div class="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                            <h3 class="font-black text-xl text-slate-800 uppercase tracking-tight">Nhập nội dung từ Excel</h3>
+                            <button @click="importModalOpen = false" class="text-slate-400 hover:text-red-500 transition">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="p-8">
+                            <form action="{{ route('instructor.courses.import', $course->id) }}" method="POST" enctype="multipart/form-data">
+                                @csrf
+
+                                <div class="mb-6 p-4 bg-blue-50 rounded-2xl border border-blue-100 text-blue-800 text-xs font-medium leading-relaxed">
+                                    <p class="font-bold mb-1">💡 Lưu ý quan trọng:</p>
+                                    <ul class="list-disc pl-4 space-y-1">
+                                        <li>File Excel cần có các cột: <strong>ten_chuong, ten_bai_hoc, loai</strong>.</li>
+                                        <li>Cột "loai" điền: video, tai lieu, bai tap, hoac quiz.</li>
+                                        <li><a href="{{ route('instructor.courses.import_template') }}" class="underline font-black hover:text-blue-600">Tải file mẫu chuẩn tại đây</a> để tránh lỗi.</li>
+                                    </ul>
+                                </div>
+
+                                <label class="block text-[10px] font-black text-slate-400 uppercase mb-3 tracking-widest">Chọn file Excel (.xlsx, .csv)</label>
+                                <input type="file" name="excel_file" required accept=".xlsx, .xls, .csv" class="block w-full text-xs text-slate-500 file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-xs file:font-black file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 transition cursor-pointer bg-slate-50 rounded-xl border border-slate-200">
+
+                                <button type="submit" class="mt-8 w-full bg-slate-900 text-white py-4 rounded-2xl font-black uppercase text-xs tracking-[0.2em] hover:bg-black transition shadow-xl shadow-slate-200">
+                                    Tiến hành nhập
+                                </button>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -427,6 +506,7 @@
 <script>
     function manageApp() {
         return {
+            importModalOpen: false,
             modalOpen: false,
             isEdit: false,
             uploading: false,

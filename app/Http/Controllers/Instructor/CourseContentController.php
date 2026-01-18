@@ -11,6 +11,10 @@ use App\Models\LessonSubmission;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
+use App\Imports\CourseContentImport;
+use Maatwebsite\Excel\Facades\Excel;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+
 class CourseContentController extends Controller
 {
     public function index($id)
@@ -169,5 +173,42 @@ class CourseContentController extends Controller
             ->get();
 
         return view('instructor.courses.submissions', compact('lesson', 'submissions'));
+    }
+
+    public function importContent(Request $request, $id)
+    {
+        $request->validate([
+            'excel_file' => 'required|mimes:xlsx,xls,csv',
+        ]);
+
+        try {
+            Excel::import(new CourseContentImport($id), $request->file('excel_file'));
+            return back()->with('success', 'Đã nhập nội dung từ Excel thành công!');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Lỗi file Excel: ' . $e->getMessage());
+        }
+    }
+
+    public function downloadTemplate()
+    {
+        $headers = [
+            'Content-Type' => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="mau_nhap_khoa_hoc.csv"',
+        ];
+
+        $callback = function () {
+            $handle = fopen('php://output', 'w');
+            fputs($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
+
+            fputcsv($handle, ['ten_chuong', 'ten_bai_hoc', 'loai_noi_dung', 'video_url', 'thoi_luong', 'noi_dung']);
+
+            fputcsv($handle, ['Chương 1: Giới thiệu', '', '', '', '', '']);
+            fputcsv($handle, ['', 'Bài 1: Cài đặt', 'video', 'https://youtu.be/xxx', '10', '']);
+            fputcsv($handle, ['', 'Bài 2: Trắc nghiệm vui', 'quiz', '', '15', '1+1 bằng mấy? | 1 | *2 | 3 | 4']);
+
+            fclose($handle);
+        };
+
+        return new StreamedResponse($callback, 200, $headers);
     }
 }

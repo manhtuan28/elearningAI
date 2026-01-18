@@ -191,7 +191,7 @@
                                      @forelse($course->chapters as $chapter)
                                      <div class="group border border-slate-100 rounded-3xl overflow-hidden hover:border-emerald-200 transition-all">
                                          <div class="bg-slate-50/50 px-6 py-4 flex justify-between items-center group-hover:bg-emerald-50/30 transition-colors">
-                                             <span class="font-black text-slate-700 text-sm italic">Chương {{ $loop->iteration }}: {{ $chapter->title }}</span>
+                                             <span class="font-black text-slate-700 text-sm italic">{{ $chapter->title }}</span>
                                          </div>
                                          <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-2 text-xs font-bold text-slate-500">
                                              @foreach($chapter->lessons as $lesson)

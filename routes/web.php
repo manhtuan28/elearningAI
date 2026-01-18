@@ -82,6 +82,9 @@ Route::middleware(['auth', CheckInstructor::class])->prefix('instructor')->name(
     Route::delete('/chapters/{chapter}', [\App\Http\Controllers\Instructor\CourseContentController::class, 'destroyChapter'])->name('chapters.destroy');
     Route::put('/lessons/{lesson}', [\App\Http\Controllers\Instructor\CourseContentController::class, 'updateLesson'])->name('lessons.update');
     Route::delete('/lessons/{lesson}', [\App\Http\Controllers\Instructor\CourseContentController::class, 'destroyLesson'])->name('lessons.destroy');
+
+    Route::post('/courses/{id}/import', [\App\Http\Controllers\Instructor\CourseContentController::class, 'importContent'])->name('courses.import');
+    Route::get('/courses/import/template', [\App\Http\Controllers\Instructor\CourseContentController::class, 'downloadTemplate'])->name('courses.import_template');
 });
 
 require __DIR__ . '/auth.php';
