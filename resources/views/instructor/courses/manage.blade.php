@@ -122,6 +122,12 @@
                 <span>Quản lý nội dung</span>
             </div>
             <h1 class="text-4xl font-black text-slate-900 tracking-tight leading-tight uppercase">{{ $course->title }}</h1>
+            <div class="mt-3 flex items-center gap-4">
+                <span class="px-3 py-1 rounded-lg bg-teal-50 text-teal-700 text-[11px] font-black uppercase border border-teal-100">
+                    Lớp: {{ $course->classroom ? $course->classroom->name : 'Chưa gán lớp' }}
+                </span>
+                <span class="text-xs font-bold text-slate-500">{{ $course->classroom ? $course->classroom->students->count() : 0 }} Sinh viên</span>
+            </div>
         </div>
 
         <div class="flex items-center gap-3">
@@ -139,7 +145,7 @@
     </div>
 
     <div x-show="importModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm" style="display: none;" x-transition>
-        <div class="bg-white rounded-[2.5rem] w-full max-w-xl shadow-2xl overflow-hidden">
+        <div class="bg-white rounded-[2.5rem] w-full max-w-lg shadow-2xl overflow-hidden">
             <div class="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50">
                 <h3 class="font-black text-xl text-slate-800 uppercase tracking-tight">Nhập nội dung từ Excel</h3>
                 <button @click="importModalOpen = false" class="text-slate-400 hover:text-red-500 transition">✕</button>
@@ -151,11 +157,9 @@
                     <div class="mb-6 p-5 bg-blue-50 rounded-2xl border border-blue-100 text-blue-800 text-xs font-medium leading-loose">
                         <p class="font-bold text-sm mb-2">📋 Hướng dẫn nhập liệu:</p>
                         <ul class="list-disc pl-4 space-y-1">
-                            <li><strong>Chương:</strong> Chỉ điền cột 'ten_chuong' (các cột khác để trống).</li>
-                            <li><strong>Bài học:</strong> Điền 'ten_bai_hoc' (để trống 'ten_chuong'). Hệ thống sẽ tự gán vào chương gần nhất bên trên.</li>
-                            <li><strong>Quiz:</strong> Nhập câu hỏi vào cột 'noi_dung' theo cú pháp:<br>
-                                <code class="bg-white px-1 py-0.5 rounded border border-blue-200">Câu hỏi? | Đáp án 1 | *Đáp án đúng | Đáp án 3</code>
-                            </li>
+                            <li><strong>Chương:</strong> Chỉ điền cột 'ten_chuong'.</li>
+                            <li><strong>Bài học:</strong> Điền 'ten_bai_hoc' (để trống 'ten_chuong').</li>
+                            <li><strong>Quiz:</strong> Nhập câu hỏi vào cột 'noi_dung'.</li>
                             <li><a href="{{ route('instructor.courses.import_template') }}" class="underline font-black text-blue-600 hover:text-blue-800">👉 Tải file mẫu tại đây</a></li>
                         </ul>
                     </div>
@@ -255,14 +259,22 @@
 
                             <div class="flex items-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
                                 @if(in_array($lesson->type, ['quiz', 'homework']))
+                                
+                                <button @click="checkProgress({{ json_encode($lesson) }})" 
+                                        class="flex items-center gap-1 px-3 py-1.5 bg-teal-50 text-teal-600 rounded-lg border border-teal-100 hover:bg-teal-100 hover:border-teal-200 transition" 
+                                        title="Kiểm tra ai chưa nộp">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                                    <span class="text-[10px] font-black">Tiến độ</span>
+                                </button>
+
                                 <a href="{{ route('instructor.lessons.submissions', $lesson->id) }}"
                                     class="flex items-center gap-1 px-3 py-1.5 bg-emerald-50 text-emerald-600 rounded-lg border border-emerald-100 hover:bg-emerald-100 hover:border-emerald-200 transition"
-                                    title="Xem bài làm của sinh viên">
+                                    title="Chấm bài chi tiết">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                                     </svg>
-                                    @if($lesson->submissions_count > 0)
-                                    <span class="text-[10px] font-black">{{ $lesson->submissions_count }}</span>
+                                    @if(isset($lesson->submissions) && $lesson->submissions->count() > 0)
+                                    <span class="text-[10px] font-black">{{ $lesson->submissions->count() }}</span>
                                     @endif
                                 </a>
                                 @endif
@@ -312,40 +324,6 @@
                         <button type="button" @click="open = false" class="px-4 text-slate-400 font-bold text-xs hover:text-slate-600">Hủy</button>
                     </form>
                 </div>
-
-                <div x-show="importModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm" style="display: none;" x-transition>
-                    <div class="bg-white rounded-[2.5rem] w-full max-w-lg shadow-2xl overflow-hidden">
-                        <div class="p-8 border-b border-slate-100 flex justify-between items-center bg-slate-50">
-                            <h3 class="font-black text-xl text-slate-800 uppercase tracking-tight">Nhập nội dung từ Excel</h3>
-                            <button @click="importModalOpen = false" class="text-slate-400 hover:text-red-500 transition">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                                </svg>
-                            </button>
-                        </div>
-                        <div class="p-8">
-                            <form action="{{ route('instructor.courses.import', $course->id) }}" method="POST" enctype="multipart/form-data">
-                                @csrf
-
-                                <div class="mb-6 p-4 bg-blue-50 rounded-2xl border border-blue-100 text-blue-800 text-xs font-medium leading-relaxed">
-                                    <p class="font-bold mb-1">💡 Lưu ý quan trọng:</p>
-                                    <ul class="list-disc pl-4 space-y-1">
-                                        <li>File Excel cần có các cột: <strong>ten_chuong, ten_bai_hoc, loai</strong>.</li>
-                                        <li>Cột "loai" điền: video, tai lieu, bai tap, hoac quiz.</li>
-                                        <li><a href="{{ route('instructor.courses.import_template') }}" class="underline font-black hover:text-blue-600">Tải file mẫu chuẩn tại đây</a> để tránh lỗi.</li>
-                                    </ul>
-                                </div>
-
-                                <label class="block text-[10px] font-black text-slate-400 uppercase mb-3 tracking-widest">Chọn file Excel (.xlsx, .csv)</label>
-                                <input type="file" name="excel_file" required accept=".xlsx, .xls, .csv" class="block w-full text-xs text-slate-500 file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-xs file:font-black file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 transition cursor-pointer bg-slate-50 rounded-xl border border-slate-200">
-
-                                <button type="submit" class="mt-8 w-full bg-slate-900 text-white py-4 rounded-2xl font-black uppercase text-xs tracking-[0.2em] hover:bg-black transition shadow-xl shadow-slate-200">
-                                    Tiến hành nhập
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -365,6 +343,57 @@
                         <div class="w-full bg-white/10 h-1.5 rounded-full overflow-hidden">
                             <div class="bg-emerald-500 h-full w-full opacity-50"></div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div x-show="progressModalOpen" class="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm" style="display: none;" x-transition>
+        <div class="bg-white rounded-[2.5rem] w-full max-w-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                <div>
+                    <h3 class="font-black text-lg text-slate-800 uppercase tracking-tight">Tiến độ nộp bài</h3>
+                    <p class="text-xs font-bold text-slate-400 mt-1" x-text="selectedLesson?.title"></p>
+                </div>
+                <button @click="progressModalOpen = false" class="text-slate-400 hover:text-red-500 transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+            </div>
+            
+            <div class="p-6 overflow-y-auto custom-scrollbar flex-1 bg-white">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                            <span class="text-xs font-black uppercase text-emerald-600 tracking-widest">Đã nộp (<span x-text="submittedList.length"></span>)</span>
+                        </div>
+                        <template x-for="sub in submittedList" :key="sub.id">
+                            <div class="p-3 rounded-xl border border-emerald-100 bg-emerald-50/50 flex items-center justify-between">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-full bg-emerald-200 text-emerald-700 flex items-center justify-center font-bold text-xs" x-text="sub.name.charAt(0)"></div>
+                                    <div>
+                                        <p class="font-bold text-sm text-slate-700" x-text="sub.name"></p>
+                                        <p class="text-[10px] text-slate-400" x-text="sub.email"></p>
+                                    </div>
+                                </div>
+                                <span class="text-xs font-bold text-emerald-600" x-text="sub.score != null ? sub.score + 'đ' : 'Đã nộp'"></span>
+                            </div>
+                        </template>
+                        <div x-show="submittedList.length === 0" class="text-center py-4 text-xs text-slate-400 italic">Chưa có ai nộp bài.</div>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+                            <span class="text-xs font-black uppercase text-red-500 tracking-widest">Chưa nộp (<span x-text="notSubmittedList.length"></span>)</span>
+                        </div>
+                        <template x-for="st in notSubmittedList" :key="st.id">
+                            <div class="p-3 rounded-xl border border-slate-100 bg-white hover:bg-slate-50 transition flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-bold text-xs" x-text="st.name.charAt(0)"></div>
+                                <div>
+                                    <p class="font-bold text-sm text-slate-700" x-text="st.name"></p>
+                                    <p class="text-[10px] text-slate-400" x-text="st.email"></p>
+                                </div>
+                            </div>
+                        </template>
+                        <div x-show="notSubmittedList.length === 0" class="text-center py-4 text-xs text-emerald-500 italic">Tất cả đã nộp đủ!</div>
                     </div>
                 </div>
             </div>
@@ -504,10 +533,14 @@
 </div>
 
 <script>
+    // Định nghĩa dữ liệu ra biến toàn cục để tránh lỗi cú pháp IDE khi dùng bên trong object
+    const _studentList = {!! json_encode($course->classroom ? $course->classroom->students : []) !!};
+
     function manageApp() {
         return {
             importModalOpen: false,
             modalOpen: false,
+            progressModalOpen: false,
             isEdit: false,
             uploading: false,
             progress: 0,
@@ -524,6 +557,12 @@
             },
             file: null,
             questions: [],
+            
+            // Dữ liệu cho tiến độ
+            selectedLesson: null,
+            students: _studentList, // Sử dụng biến đã định nghĩa ở trên
+            submittedList: [],
+            notSubmittedList: [],
 
             initEditors() {
                 ClassicEditor.create(document.querySelector('#editor'), {
@@ -534,6 +573,27 @@
                         writer.addClass('ck-content', ed.editing.view.document.getRoot());
                     });
                 });
+            },
+
+            // LOGIC KIỂM TRA TIẾN ĐỘ
+            checkProgress(lesson) {
+                this.selectedLesson = lesson;
+                this.submittedList = [];
+                this.notSubmittedList = [];
+                
+                // An toàn: Kiểm tra nếu submissions tồn tại
+                const submittedUserIds = (lesson.submissions || []).map(s => s.user_id);
+                
+                this.students.forEach(student => {
+                    if (submittedUserIds.includes(student.id)) {
+                        const sub = lesson.submissions.find(s => s.user_id === student.id);
+                        this.submittedList.push({ ...student, score: sub.score });
+                    } else {
+                        this.notSubmittedList.push(student);
+                    }
+                });
+                
+                this.progressModalOpen = true;
             },
 
             editChapterPrompt(id, oldTitle) {

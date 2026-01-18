@@ -20,12 +20,15 @@ class CourseContentController extends Controller
     public function index($id)
     {
         $course = Course::where('id', $id)->where('user_id', auth()->id())
-            ->with(['chapters.lessons' => function ($q) {
-                $q->withCount('submissions')->orderBy('sort_order');
-            }])->firstOrFail();
+            ->with([
+                'classroom.students',
+                'chapters.lessons' => function ($q) {
+                    $q->with('submissions')->orderBy('sort_order');
+                }
+            ])->firstOrFail();
+
         return view('instructor.courses.manage', compact('course'));
     }
-
     public function storeChapter(Request $request, $id)
     {
         $request->validate(['title' => 'required']);
