@@ -68,7 +68,8 @@ Route::middleware(['auth', CheckAdmin::class])->prefix('admin')->name('admin.')-
 // --- KHU VỰC GIẢNG VIÊN ---
 Route::middleware(['auth', CheckInstructor::class])->prefix('instructor')->name('instructor.')->group(function () {
     Route::get('/', [InstructorDashboardController::class, 'index'])->name('dashboard');
-
+    Route::post('/submissions/{id}/grade', [\App\Http\Controllers\Instructor\CourseContentController::class, 'gradeSubmission'])
+        ->name('submissions.grade');
     Route::get('/courses', [\App\Http\Controllers\Instructor\CourseController::class, 'index'])->name('courses.index');
 
     Route::get('/courses/{id}/manage', [\App\Http\Controllers\Instructor\CourseContentController::class, 'index'])->name('courses.manage');

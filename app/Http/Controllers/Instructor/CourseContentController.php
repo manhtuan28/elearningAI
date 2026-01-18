@@ -172,7 +172,9 @@ class CourseContentController extends Controller
             ->latest()
             ->get();
 
-        return view('instructor.courses.submissions', compact('lesson', 'submissions'));
+        $quizData = ($lesson->type === 'quiz') ? json_decode($lesson->content, true) : null;
+
+        return view('instructor.courses.submissions', compact('lesson', 'submissions', 'quizData'));
     }
 
     public function importContent(Request $request, $id)
@@ -210,5 +212,20 @@ class CourseContentController extends Controller
         };
 
         return new StreamedResponse($callback, 200, $headers);
+    }
+
+    public function gradeSubmission(Request $request, $id)
+    {
+        $request->validate([
+            'score' => 'required|numeric|min:0|max:10'
+        ]);
+
+        $submission = LessonSubmission::findOrFail($id);
+        $submission->update([
+            'score' => $request->score,
+            'status' => 'completed'
+        ]);
+
+        return response()->json(['message' => 'Đã chấm điểm thành công!']);
     }
 }

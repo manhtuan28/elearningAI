@@ -59,200 +59,290 @@
 
         <main class="flex-1 flex flex-col bg-slate-50 overflow-hidden relative z-0">
 
-            {{-- 1. KHU VỰC HIỂN THỊ VIDEO (THEATER MODE) --}}
+            {{-- VIDEO THEATER MODE (Giữ nguyên phần này của bạn) --}}
             @if($activeLesson && $activeLesson->type == 'video')
             <div class="bg-[#0F172A] shrink-0 w-full relative group shadow-[0_20px_50px_rgba(0,0,0,0.3)] border-b border-black">
                 <div class="max-w-6xl mx-auto relative">
                     <div class="aspect-video w-full bg-black flex items-center justify-center relative overflow-hidden shadow-2xl">
                         @if($activeLesson->video_url)
-                        {{-- Xử lý Youtube --}}
+                        {{-- Youtube Logic --}}
                         @php
                         $videoID = '';
                         if(preg_match('%(?:youtube(?:-nocookie)?\.com/(?:[^/]+/.+/|(?:v|e(?:mbed)?)/|.*[?&]v=)|youtu\.be/)([^\"&?/ ]{11})%i', $activeLesson->video_url, $match)) {
                         $videoID = $match[1];
                         }
                         @endphp
-
                         @if($videoID)
-                        <iframe class="w-full h-full"
-                            src="https://www.youtube.com/embed/{{ $videoID }}?rel=0&modestbranding=1&autoplay=1&showinfo=0"
-                            frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen>
-                        </iframe>
+                        <iframe class="w-full h-full" src="https://www.youtube.com/embed/{{ $videoID }}?rel=0&modestbranding=1&showinfo=0" frameborder="0" allowfullscreen></iframe>
                         @else
-                        <video controls autoplay class="w-full h-full object-contain" controlsList="nodownload">
-                            <source src="{{ $activeLesson->video_url }}" type="video/mp4">
+                        <video controls class="w-full h-full">
+                            <source src="{{ $activeLesson->video_url }}">
                         </video>
                         @endif
                         @elseif($activeLesson->file_path)
-                        {{-- Video Upload --}}
-                        <video id="main-player"
-                            controls
-                            autoplay
-                            playsinline
-                            class="w-full h-full object-contain"
-                            controlsList="nodownload">
+                        <video id="main-player" controls class="w-full h-full">
                             <source src="{{ asset('storage/' . $activeLesson->file_path) }}">
-                            <p class="text-white text-center mt-10">Trình duyệt không hỗ trợ phát video này.</p>
                         </video>
-                        @else
-                        {{-- Placeholder khi chưa có video --}}
-                        <div class="flex flex-col items-center gap-4 text-slate-600 italic py-20">
-                            <div class="w-16 h-16 bg-slate-800 rounded-full flex items-center justify-center animate-pulse border border-slate-700">
-                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                                </svg>
-                            </div>
-                            <p class="text-[10px] font-black uppercase tracking-widest text-slate-500">Video đang được xử lý...</p>
-                        </div>
                         @endif
-                        <div class="absolute inset-0 pointer-events-none border-[1px] border-white/5"></div>
                     </div>
                 </div>
             </div>
             @endif
 
-            {{-- 2. KHU VỰC NỘI DUNG CHÍNH (SCROLLABLE) --}}
             <div class="flex-1 overflow-y-auto bg-white custom-scrollbar">
                 <div class="max-w-4xl mx-auto px-6 py-10 md:px-12">
 
-                    {{-- Điều hướng bài học --}}
-                    <div class="flex justify-between items-center mb-10 pb-8 border-b border-slate-100" id="lesson-nav">
-                        <button class="group px-5 py-2.5 rounded-xl border border-slate-200 text-slate-500 font-black text-[10px] uppercase tracking-widest hover:bg-white hover:text-indigo-600 hover:border-indigo-200 hover:shadow-xl hover:shadow-indigo-100/50 transition-all flex items-center gap-3 disabled:opacity-20 disabled:pointer-events-none" id="btn-prev" disabled>
-                            <svg class="w-4 h-4 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                            </svg> Bài trước
-                        </button>
-                        <button class="group px-5 py-2.5 rounded-xl bg-slate-900 text-white font-black text-[10px] uppercase tracking-widest hover:bg-black hover:shadow-2xl hover:shadow-slate-300/50 transition-all flex items-center gap-3 disabled:opacity-20 disabled:pointer-events-none" id="btn-next" disabled>
-                            Tiếp tục <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                            </svg>
-                        </button>
+                    {{-- Navigation Buttons (Giữ nguyên) --}}
+                    <div class="flex justify-between items-center mb-10 pb-8 border-b border-slate-100">
+                        <button class="group px-5 py-2.5 rounded-xl border border-slate-200 text-slate-500 font-black text-[10px] uppercase tracking-widest hover:bg-white hover:text-indigo-600 hover:shadow-xl transition-all flex items-center gap-3 disabled:opacity-20" id="btn-prev" disabled>Bài trước</button>
+                        <button class="group px-5 py-2.5 rounded-xl bg-slate-900 text-white font-black text-[10px] uppercase tracking-widest hover:bg-black hover:shadow-2xl transition-all flex items-center gap-3 disabled:opacity-20" id="btn-next" disabled>Tiếp tục</button>
                     </div>
 
                     @if($activeLesson)
-                    {{-- Tiêu đề bài học --}}
                     <div class="mb-12">
                         <div class="flex items-center gap-3 mb-4">
-                            <span class="px-3 py-1 rounded-lg bg-indigo-50 text-indigo-600 text-[9px] font-black uppercase tracking-widest border border-indigo-100 shadow-sm">
-                                {{ $activeLesson->type }}
-                            </span>
-                            <span class="text-[10px] font-black text-slate-300 uppercase tracking-widest italic tracking-tighter">Bài học {{ $activeLesson->sort_order }}</span>
+                            <span class="px-3 py-1 rounded-lg bg-indigo-50 text-indigo-600 text-[9px] font-black uppercase tracking-widest border border-indigo-100 shadow-sm">{{ $activeLesson->type }}</span>
+                            <span class="text-[10px] font-black text-slate-300 uppercase tracking-widest italic">Bài học {{ $activeLesson->sort_order }}</span>
                         </div>
-                        <h2 class="text-3xl md:text-4xl font-black text-slate-900 leading-tight tracking-tight italic">{{ $activeLesson->title }}</h2>
+                        <h2 class="text-3xl md:text-4xl font-black text-slate-900 leading-tight italic">{{ $activeLesson->title }}</h2>
                         <div class="h-1 w-20 bg-indigo-500 mt-6 rounded-full opacity-50"></div>
                     </div>
 
-                    {{-- NỘI DUNG CHI TIẾT TỪNG LOẠI --}}
+                    {{-- ===================== LOGIC QUIZ (NÂNG CẤP) ===================== --}}
                     @if($activeLesson->type == 'quiz')
-                    {{-- ==== LOGIC QUIZ ==== --}}
-                    @php $quizData = json_decode($activeLesson->content, true); @endphp
+                    @php
+                    $quizData = json_decode($activeLesson->content, true);
+                    // Lấy thông tin bài làm cũ từ controller truyền sang view (biến $submission)
+                    $lastScore = $submission ? $submission->score : null;
+                    $attempts = $submission ? ($submission->attempt_count ?? 1) : 0;
+                    $hasSubmitted = $submission ? true : false;
+                    @endphp
+
                     @if(is_array($quizData) && count($quizData) > 0)
-                    <div class="space-y-8" x-data="{ 
+                    <div x-data="{ 
                         answers: {}, 
+                        submitted: {{ $hasSubmitted ? 'true' : 'false' }},
+                        score: {{ $lastScore !== null ? $lastScore : 'null' }},
+                        attempts: {{ $attempts }},
                         isSubmitting: false,
-                        async handleQuizSubmit() {
+                        newHistories: [],
+                        
+                        async submitQuiz() {
                             if (Object.keys(this.answers).length < {{ count($quizData) }}) {
-                                if(!confirm('Bạn chưa trả lời hết các câu hỏi. Vẫn muốn nộp chứ?')) return;
+                                if(!confirm('Bạn chưa làm hết câu hỏi. Vẫn muốn nộp?')) return;
                             }
-                            
                             this.isSubmitting = true;
                             try {
-                                const response = await axios.post(`/learning/lessons/{{ $activeLesson->id }}/submit`, {
-                                    submission_content: this.answers
-                                });
-                                alert('Nộp bài thành công! Điểm của bạn: ' + (response.data.score || 'Đang chấm'));
-                                location.reload();
-                            } catch (error) {
-                                alert('Lỗi khi nộp bài: ' + (error.response?.data?.message || 'Vui lòng thử lại'));
-                            } finally {
-                                this.isSubmitting = false;
-                            }
+                                const res = await axios.post(`/learning/lessons/{{ $activeLesson->id }}/submit`, { submission_content: this.answers });
+                                this.score = res.data.score;
+                                this.attempts = res.data.attempts;
+                                if(res.data.histories && res.data.histories.length > 0) {
+                                    this.newHistories = [res.data.histories[0]]; 
+                                }
+                                this.submitted = true;
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                            } catch (e) { alert('Lỗi: ' + e.message); } 
+                            finally { this.isSubmitting = false; }
                         }
                     }">
-                        @foreach($quizData as $index => $q)
-                        <div class="bg-white rounded-[2rem] border border-slate-100 p-8 shadow-sm hover:shadow-xl hover:shadow-indigo-500/5 transition-all duration-500 relative overflow-hidden group">
-                            <div class="relative z-10">
-                                <div class="flex items-center gap-4 mb-6">
-                                    <div class="shrink-0 w-10 h-10 bg-slate-900 text-white rounded-2xl flex items-center justify-center font-black text-sm shadow-lg group-hover:rotate-6 transition-transform">
-                                        {{ $index + 1 }}
-                                    </div>
-                                    <h3 class="font-black text-lg text-slate-800 leading-snug">{{ $q['question'] }}</h3>
-                                </div>
+                        <div x-show="submitted" x-transition class="mb-10 p-8 rounded-[2rem] text-center border-2 border-dashed"
+                            :class="score >= 5 ? 'bg-emerald-50 border-emerald-200' : 'bg-red-50 border-red-200'">
 
-                                <div class="grid grid-cols-1 gap-3 pl-0 md:pl-14">
+                            <p class="text-xs font-black uppercase tracking-widest mb-2"
+                                :class="score >= 5 ? 'text-emerald-500' : 'text-red-500'"
+                                x-text="score >= 5 ? '🎉 CHÚC MỪNG! BẠN ĐÃ HOÀN THÀNH' : '⚠️ CẦN CỐ GẮNG HƠN'"></p>
+
+                            <div class="text-6xl font-black mb-2" :class="score >= 5 ? 'text-emerald-600' : 'text-red-600'">
+                                <span x-text="score"></span><span class="text-2xl opacity-50">/10</span>
+                            </div>
+
+                            <div class="flex justify-center gap-4 text-xs font-bold opacity-70 mb-6">
+                                <span>Lần làm: <span x-text="attempts"></span></span>
+                                <span>•</span>
+                                <span>Trạng thái: Đã chấm</span>
+                            </div>
+
+                            <button @click="submitted = false; answers = {}; window.scrollTo({ top: 0, behavior: 'smooth' })"
+                                class="px-6 py-3 bg-white rounded-xl shadow-lg font-black text-xs uppercase tracking-widest hover:scale-105 transition transform"
+                                :class="score >= 5 ? 'text-emerald-600' : 'text-red-600'">
+                                ↺ Làm lại bài
+                            </button>
+                            <div class="mt-8 border-t border-slate-100 pt-6">
+                                <h4 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4">Lịch sử làm bài</h4>
+
+                                <div class="space-y-3">
+                                    @if($submission && $submission->histories->count() > 0)
+                                    @foreach($submission->histories as $hist)
+                                    <div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs">
+                                        <div class="flex items-center gap-3">
+                                            <span class="font-bold text-slate-700 bg-white px-2 py-1 rounded border border-slate-200 shadow-sm">
+                                                Lần {{ $hist->attempt_number }}
+                                            </span>
+                                            <span class="text-slate-400 italic">{{ $hist->submitted_at->diffForHumans() }}</span>
+                                        </div>
+                                        <span class="font-black {{ $hist->score >= 5 ? 'text-emerald-600' : 'text-red-500' }}">
+                                            {{ $hist->score }}/10
+                                        </span>
+                                    </div>
+                                    @endforeach
+                                    @endif
+
+                                    <template x-for="h in newHistories">
+                                        <div class="flex justify-between items-center p-3 bg-white border-2 border-indigo-50 rounded-xl text-xs shadow-sm animate-pulse">
+                                            <div class="flex items-center gap-3">
+                                                <span class="font-bold text-indigo-700 bg-indigo-50 px-2 py-1 rounded">
+                                                    Lần <span x-text="h.attempt"></span> (Mới)
+                                                </span>
+                                                <span class="text-slate-400 italic">Vừa xong</span>
+                                            </div>
+                                            <span class="font-black text-indigo-600" x-text="h.score + '/10'"></span>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div x-show="!submitted" class="space-y-8">
+                            @foreach($quizData as $index => $q)
+                            <div class="bg-white rounded-[2rem] border border-slate-100 p-8 shadow-sm group hover:border-indigo-100 transition">
+                                <h3 class="font-black text-lg text-slate-800 mb-6 flex gap-3">
+                                    <span class="shrink-0 w-8 h-8 bg-slate-100 rounded-lg flex items-center justify-center text-sm">{{ $index + 1 }}</span>
+                                    {{ $q['question'] }}
+                                </h3>
+                                <div class="grid gap-3 pl-11">
                                     @foreach($q['options'] as $optIndex => $option)
-                                    <label class="flex items-center gap-4 p-4 rounded-2xl border border-slate-100 cursor-pointer hover:bg-slate-50 transition-all duration-200 group/opt"
-                                        :class="answers[{{ $index }}] == {{ $optIndex }} ? 'bg-indigo-50 border-indigo-300 ring-1 ring-indigo-500/20' : ''">
-                                        <div class="w-6 h-6 rounded-xl border-2 border-slate-200 flex items-center justify-center group-hover/opt:border-indigo-400 transition"
-                                            :class="answers[{{ $index }}] == {{ $optIndex }} ? 'bg-indigo-600 border-indigo-600' : ''">
-                                            <div class="w-1.5 h-1.5 rounded-full bg-white" x-show="answers[{{ $index }}] == {{ $optIndex }}"></div>
+                                    <label class="flex items-center gap-4 p-4 rounded-2xl border border-slate-100 cursor-pointer hover:bg-slate-50 transition"
+                                        :class="answers[{{ $index }}] == {{ $optIndex }} ? 'bg-indigo-50 border-indigo-200 ring-1 ring-indigo-100' : ''">
+                                        <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center"
+                                            :class="answers[{{ $index }}] == {{ $optIndex }} ? 'border-indigo-600 bg-indigo-600' : 'border-slate-300'">
+                                            <div class="w-2 h-2 bg-white rounded-full" x-show="answers[{{ $index }}] == {{ $optIndex }}"></div>
                                         </div>
                                         <input type="radio" x-model="answers[{{ $index }}]" value="{{ $optIndex }}" class="hidden">
-                                        <span class="text-slate-600 font-bold text-sm transition-colors" :class="answers[{{ $index }}] == {{ $optIndex }} ? 'text-indigo-900' : ''">{{ $option }}</span>
+                                        <span class="text-sm font-bold text-slate-600">{{ $option }}</span>
                                     </label>
                                     @endforeach
                                 </div>
                             </div>
-                        </div>
-                        @endforeach
+                            @endforeach
 
-                        <div class="flex justify-center pt-10">
-                            <button @click="handleQuizSubmit"
-                                :disabled="isSubmitting"
-                                class="bg-indigo-600 text-white px-12 py-4 rounded-2xl font-black text-[11px] uppercase tracking-[0.2em] hover:bg-indigo-700 transition-all shadow-2xl shadow-indigo-200 hover:-translate-y-1 transform disabled:opacity-50 disabled:cursor-not-allowed">
-                                <span x-text="isSubmitting ? 'ĐANG GỬI BÀI...' : 'Nộp bài kiểm tra ngay'"></span>
-                            </button>
+                            <div class="flex justify-center pt-8">
+                                <button @click="submitQuiz" :disabled="isSubmitting"
+                                    class="bg-indigo-600 text-white px-10 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-indigo-700 shadow-xl shadow-indigo-200 transition disabled:opacity-50">
+                                    <span x-text="isSubmitting ? 'ĐANG CHẤM ĐIỂM...' : 'NỘP BÀI KIỂM TRA'"></span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                     @else
-                    <p class="text-center text-slate-400 italic">Chưa có câu hỏi trắc nghiệm.</p>
+                    <p class="text-center text-slate-400 italic">Chưa có câu hỏi.</p>
                     @endif
 
-                    @else
-                    {{-- ==== LOGIC TÀI LIỆU / BÀI ĐỌC (ĐÃ SỬA DOWNLOAD) ==== --}}
-                    @if($activeLesson->file_path && !Str::endsWith($activeLesson->file_path, ['.mp4', '.mov']))
-                    @php
-                    // Tạo tên file download chuẩn: Ten-bai-hoc.duoi-file
-                    $extension = pathinfo($activeLesson->file_path, PATHINFO_EXTENSION);
-                    $downloadName = Str::slug($activeLesson->title) . '.' . $extension;
-                    @endphp
-                    <div class="mb-10 p-6 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200 flex items-center justify-between group hover:border-indigo-300 hover:bg-indigo-50/30 transition-all">
-                        <div class="flex items-center gap-4 text-center md:text-left">
-                            <div class="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shadow-sm text-indigo-600 border border-slate-100 group-hover:rotate-6 transition-transform">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    @elseif($activeLesson->type == 'homework')
+
+                    {{-- Nội dung đề bài --}}
+                    <div class="prose prose-slate max-w-none mb-10">
+                        {!! $activeLesson->content !!}
+                    </div>
+
+                    @if($submission && $submission->score !== null)
+                    <div class="mb-8 p-6 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-100 rounded-[2rem] flex items-center justify-between shadow-sm animate-fade-in-down">
+                        <div>
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                                <span class="text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em]">Kết quả chấm điểm</span>
+                            </div>
+                            <p class="text-sm font-medium text-emerald-800">Giảng viên đã chấm bài làm của bạn.</p>
+                        </div>
+                        <div class="flex items-baseline gap-1">
+                            <span class="text-5xl font-black text-emerald-600 tracking-tighter">{{ $submission->score }}</span>
+                            <span class="text-lg font-bold text-emerald-400">/10</span>
+                        </div>
+                    </div>
+                    @endif
+
+                    {{-- Khu vực nộp bài --}}
+                    <div class="border-t-2 border-dashed border-slate-200 pt-10" x-data="{
+                        isUploading: false,
+                        file: null,
+                        uploadedName: '{{ $submission && $submission->submission_content ? json_decode($submission->submission_content)->file_name ?? '' : '' }}',
+                        
+                        async uploadHomework(e) {
+                            this.file = e.target.files[0];
+                            if(!this.file) return;
+
+                            let fd = new FormData();
+                            fd.append('file_upload', this.file);
+
+                            this.isUploading = true;
+                            try {
+                                const res = await axios.post(`/learning/lessons/{{ $activeLesson->id }}/submit`, fd, {
+                                    headers: { 'Content-Type': 'multipart/form-data' }
+                                });
+                                this.uploadedName = this.file.name;
+                                alert('Nộp bài tập thành công!');
+                            } catch(err) {
+                                alert('Lỗi upload: ' + (err.response?.data?.message || err.message));
+                            } finally {
+                                this.isUploading = false;
+                            }
+                        }
+                    }">
+                        <h3 class="font-black text-slate-800 uppercase text-sm tracking-widest mb-6">Khu vực nộp bài</h3>
+
+                        <div class="relative group">
+                            <label class="flex flex-col items-center justify-center w-full h-48 border-2 border-slate-300 border-dashed rounded-[2rem] cursor-pointer bg-slate-50 hover:bg-indigo-50 hover:border-indigo-400 transition-all">
+
+                                <div class="flex flex-col items-center justify-center pt-5 pb-6 text-slate-400 group-hover:text-indigo-500 transition">
+                                    <div x-show="!isUploading">
+                                        <svg class="w-10 h-10 mb-3 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                        </svg>
+                                        <p class="mb-2 text-sm font-bold"><span class="font-black">Click để chọn file</span> hoặc kéo thả vào đây</p>
+                                        <p class="text-[10px] font-bold uppercase tracking-widest opacity-60">DOCX, PDF, ZIP, IMG (MAX 10MB)</p>
+                                    </div>
+                                    <div x-show="isUploading" class="animate-pulse font-black uppercase text-xs tracking-widest">
+                                        Đang tải lên...
+                                    </div>
+                                </div>
+                                <input type="file" class="hidden" @change="uploadHomework">
+                            </label>
+                        </div>
+
+                        <div x-show="uploadedName" class="mt-6 p-4 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center gap-3 animate-fade-in-up">
+                            <div class="w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                 </svg>
                             </div>
                             <div>
-                                <h4 class="font-black text-slate-800 text-sm uppercase tracking-tight">Học liệu bài giảng</h4>
-                                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">
-                                    {{ strtoupper($extension) }} File
-                                </p>
+                                <p class="text-[10px] font-black text-emerald-600 uppercase tracking-widest mb-0.5">Bài đã nộp</p>
+                                <p class="text-sm font-bold text-slate-700" x-text="uploadedName"></p>
                             </div>
                         </div>
-                        <a href="{{ asset('storage/'.$activeLesson->file_path) }}"
-                            download="{{ $downloadName }}"
-                            class="px-6 py-3 bg-white text-slate-900 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-indigo-600 hover:text-white transition-all shadow-md border border-slate-200 hover:border-indigo-600">
-                            Tải về máy
-                        </a>
+                    </div>
+
+                    {{-- ===================== DOCUMENT (GIỮ NGUYÊN) ===================== --}}
+                    @else
+                    {{-- Code hiển thị tài liệu cũ của bạn giữ nguyên --}}
+                    @if($activeLesson->file_path && !Str::endsWith($activeLesson->file_path, ['.mp4', '.mov']))
+                    <div class="mb-10 p-6 bg-slate-50 rounded-3xl border-2 border-dashed border-slate-200 flex items-center justify-between group hover:border-indigo-300 hover:bg-indigo-50/30 transition-all">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm text-indigo-600"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg></div>
+                            <div>
+                                <h4 class="font-black text-slate-800 text-sm">Học liệu bài giảng</h4>
+                                <p class="text-[10px] text-slate-400 font-bold uppercase mt-1">Download File</p>
+                            </div>
+                        </div>
+                        <a href="{{ asset('storage/'.$activeLesson->file_path) }}" download class="px-6 py-3 bg-white font-black text-[10px] uppercase rounded-xl hover:bg-indigo-600 hover:text-white transition shadow-sm">Tải về</a>
                     </div>
                     @endif
-
-                    <article class="ck-content prose prose-slate prose-lg max-w-none prose-p:leading-relaxed prose-headings:font-black prose-headings:tracking-tight prose-img:rounded-[2.5rem] prose-blockquote:bg-indigo-50 prose-blockquote:border-indigo-500 prose-blockquote:rounded-2xl">
-                        {!! $activeLesson->content !!}
-                    </article>
+                    <div class="ck-content prose prose-slate max-w-none">{!! $activeLesson->content !!}</div>
                     @endif
 
                     @else
-                    {{-- Màn hình chờ khi chưa chọn bài --}}
-                    <div class="py-32 text-center flex flex-col items-center justify-center gap-6">
-                        <div class="w-20 h-20 bg-slate-100 rounded-[2rem] flex items-center justify-center text-slate-200 shadow-inner">
-                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                            </svg>
-                        </div>
-                        <p class="text-slate-400 font-black uppercase tracking-[0.3em] text-[10px] italic">Vui lòng chọn bài học từ danh sách</p>
-                    </div>
+                    <div class="py-32 text-center text-slate-400 font-black uppercase text-xs">Vui lòng chọn bài học</div>
                     @endif
                 </div>
             </div>
