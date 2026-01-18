@@ -69,10 +69,16 @@
                         </td>
 
                         <td class="px-6 py-4 text-right">
-                            <a href="{{ route('instructor.courses.manage', $course->id) }}" class="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-purple-100 text-purple-600 rounded-lg hover:bg-purple-600 hover:text-white hover:border-purple-600 transition shadow-sm font-bold text-xs uppercase tracking-wider">
-                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
-                                Biên soạn
-                            </a>
+                            <div class="flex items-center justify-end gap-2">
+                                <a href="{{ route('instructor.courses.students', $course->id) }}" class="p-2 text-slate-400 hover:text-teal-600 hover:bg-teal-50 rounded-lg transition border border-transparent hover:border-teal-100" title="Danh sách sinh viên">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                                </a>
+
+                                <a href="{{ route('instructor.courses.manage', $course->id) }}" class="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-purple-100 text-purple-600 rounded-lg hover:bg-purple-600 hover:text-white hover:border-purple-600 transition shadow-sm font-bold text-xs uppercase tracking-wider">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                    Biên soạn
+                                </a>
+                            </div>
                         </td>
                     </tr>
                     @empty

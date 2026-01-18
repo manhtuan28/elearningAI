@@ -5,6 +5,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\CourseController as AdminCourseController;
 use App\Http\Controllers\Instructor\DashboardController as InstructorDashboardController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LearningController;
 
 use App\Http\Middleware\CheckAdmin;
 use App\Http\Middleware\CheckInstructor;
@@ -21,11 +22,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::get('/courses/{id}/detail', [\App\Http\Controllers\LearningController::class, 'detail'])
+    // --- KHU VỰC HỌC TẬP (LEARNING) ---
+    Route::get('/courses/{id}/detail', [LearningController::class, 'detail'])
         ->name('learning.detail');
 
-    Route::get('/learning/{id}/{lesson_id?}', [\App\Http\Controllers\LearningController::class, 'show'])
+    Route::get('/learning/{id}/{lesson_id?}', [LearningController::class, 'show'])
         ->name('learning.course');
+
+    Route::post('/learning/lessons/{lessonId}/submit', [LearningController::class, 'submitLesson'])
+        ->name('learning.lesson.submit');
+
+    Route::get('/instructor/lessons/{lessonId}/submissions', [\App\Http\Controllers\Instructor\CourseContentController::class, 'viewSubmissions'])
+        ->name('instructor.lessons.submissions');
 });
 
 // --- KHU VỰC ADMIN ---
@@ -65,6 +73,8 @@ Route::middleware(['auth', CheckInstructor::class])->prefix('instructor')->name(
 
     Route::get('/courses/{id}/manage', [\App\Http\Controllers\Instructor\CourseContentController::class, 'index'])->name('courses.manage');
     Route::post('/courses/{id}/chapters', [\App\Http\Controllers\Instructor\CourseContentController::class, 'storeChapter'])->name('chapters.store');
+    Route::get('/courses/{id}/students', [\App\Http\Controllers\Instructor\CourseController::class, 'students'])->name('courses.students');
+
 
     Route::post('/chapters/{chapter_id}/lessons', [\App\Http\Controllers\Instructor\CourseContentController::class, 'storeLesson'])->name('lessons.store');
 

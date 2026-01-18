@@ -24,4 +24,16 @@ class CourseController extends Controller
 
         return view('instructor.courses.index', compact('courses'));
     }
+
+    public function students($id)
+    {
+        $course = Course::where('id', $id)
+            ->where('user_id', auth()->id())
+            ->with(['classroom.students'])
+            ->firstOrFail();
+
+        $students = $course->classroom ? $course->classroom->students : collect([]);
+
+        return view('instructor.courses.students', compact('course', 'students'));
+    }
 }

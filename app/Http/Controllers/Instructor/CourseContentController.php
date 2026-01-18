@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Course;
 use App\Models\Chapter;
 use App\Models\Lesson;
+use App\Models\LessonSubmission;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
@@ -16,7 +17,7 @@ class CourseContentController extends Controller
     {
         $course = Course::where('id', $id)->where('user_id', auth()->id())
             ->with(['chapters.lessons' => function ($q) {
-                $q->orderBy('sort_order');
+                $q->withCount('submissions')->orderBy('sort_order');
             }])->firstOrFail();
         return view('instructor.courses.manage', compact('course'));
     }
@@ -75,7 +76,11 @@ class CourseContentController extends Controller
 
         if ($request->hasFile('file_upload')) {
             $folder = ($request->type == 'video') ? 'videos' : 'documents';
-            $lessonData['file_path'] = $request->file('file_upload')->store($folder, 'public');
+            $file = $request->file('file_upload');
+
+            $filename = time() . '-' . Str::slug(pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME)) . '.' . $file->getClientOriginalExtension();
+
+            $lessonData['file_path'] = $file->storeAs($folder, $filename, 'public');
         }
 
         if ($request->type == 'quiz') {
@@ -86,7 +91,7 @@ class CourseContentController extends Controller
 
         Lesson::create($lessonData);
 
-        return response()->json(['message' => 'Đã thêm bài học thành công!']);
+        return response()->json(['message' => 'Đã thêm nội dung thành công!']);
     }
 
     public function updateLesson(Request $request, $id)
@@ -106,13 +111,27 @@ class CourseContentController extends Controller
         ];
 
         if ($request->hasFile('file_upload')) {
-            if ($lesson->file_path) {
+            if (isset($lesson) && $lesson->file_path) {
                 Storage::disk('public')->delete($lesson->file_path);
             }
-            $folder = ($request->type == 'video') ? 'videos' : 'documents';
-            $data['file_path'] = $request->file('file_upload')->store($folder, 'public');
-        }
 
+            $file = $request->file('file_upload');
+            $folder = ($request->type == 'video') ? 'videos' : 'documents';
+
+            $originalName = pathinfo($file->getClientOriginalName(), PATHINFO_FILENAME);
+            $extension = $file->getClientOriginalExtension();
+            $cleanName = Str::slug($originalName) . '.' . $extension;
+
+            $fileName = time() . '-' . $cleanName;
+
+            $path = $file->storeAs($folder, $fileName, 'public');
+
+            if (isset($lessonData)) {
+                $lessonData['file_path'] = $path;
+            } else {
+                $data['file_path'] = $path;
+            }
+        }
         if ($request->type == 'quiz') {
             if ($request->has('quiz')) {
                 $data['content'] = json_encode($request->quiz);
@@ -129,12 +148,26 @@ class CourseContentController extends Controller
     public function destroyLesson($id)
     {
         $lesson = Lesson::findOrFail($id);
-
         if ($lesson->file_path) {
             Storage::disk('public')->delete($lesson->file_path);
         }
-
         $lesson->delete();
         return back()->with('success', 'Đã xóa bài học.');
+    }
+
+    public function viewSubmissions($lessonId)
+    {
+        $lesson = Lesson::with('chapter.course')->findOrFail($lessonId);
+
+        if ($lesson->chapter->course->user_id != auth()->id()) {
+            abort(403);
+        }
+
+        $submissions = LessonSubmission::where('lesson_id', $lessonId)
+            ->with('user')
+            ->latest()
+            ->get();
+
+        return view('instructor.courses.submissions', compact('lesson', 'submissions'));
     }
 }

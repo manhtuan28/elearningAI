@@ -10,18 +10,18 @@ class Lesson extends Model
     use HasFactory;
 
     protected $fillable = [
-        'chapter_id',
-        'title',
-        'slug',
-        'type',
-        'video_url',
-        'file_path',
-        'content',
-        'duration',
-        'sort_order'
+        'chapter_id', 'title', 'slug', 'type', 
+        'video_url', 'file_path', 'content', 
+        'duration', 'sort_order'
     ];
+
     public function chapter()
     {
         return $this->belongsTo(Chapter::class);
+    }
+
+    public function submissions()
+    {
+        return $this->hasMany(LessonSubmission::class);
     }
 }
