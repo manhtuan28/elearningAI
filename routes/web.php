@@ -26,6 +26,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+
+    Route::get('/learning/{id}/{lesson_id?}', [\App\Http\Controllers\LearningController::class, 'show'])
+        ->name('learning.course');
 });
 
 Route::middleware(['auth', CheckAdmin::class])->prefix('admin')->name('admin.')->group(function () {
@@ -58,6 +61,18 @@ Route::middleware(['auth', CheckAdmin::class])->prefix('admin')->name('admin.')-
 
 Route::middleware(['auth', CheckInstructor::class])->prefix('instructor')->name('instructor.')->group(function () {
     Route::get('/', [InstructorDashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('/courses', [\App\Http\Controllers\Instructor\CourseController::class, 'index'])->name('courses.index');
+
+    Route::get('/courses/{id}/manage', [\App\Http\Controllers\Instructor\CourseContentController::class, 'index'])->name('courses.manage');
+    Route::post('/courses/{id}/chapters', [\App\Http\Controllers\Instructor\CourseContentController::class, 'storeChapter'])->name('chapters.store');
+
+    Route::post('/chapters/{chapter_id}/lessons', [\App\Http\Controllers\Instructor\CourseContentController::class, 'storeLesson'])->name('lessons.store');
+
+    Route::put('/chapters/{chapter}', [\App\Http\Controllers\Instructor\CourseContentController::class, 'updateChapter'])->name('chapters.update');
+    Route::delete('/chapters/{chapter}', [\App\Http\Controllers\Instructor\CourseContentController::class, 'destroyChapter'])->name('chapters.destroy');
+    Route::put('/lessons/{lesson}', [\App\Http\Controllers\Instructor\CourseContentController::class, 'updateLesson'])->name('lessons.update');
+    Route::delete('/lessons/{lesson}', [\App\Http\Controllers\Instructor\CourseContentController::class, 'destroyLesson'])->name('lessons.destroy');
 });
 
 require __DIR__ . '/auth.php';

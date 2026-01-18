@@ -11,10 +11,19 @@ class DashboardController extends Controller
     public function index()
     {
         $userId = auth()->id();
-        $myCourses = Course::where('user_id', $userId)->latest()->get();
+
+        $myCourses = Course::where('user_id', $userId)
+            ->with(['classroom' => function($query) {
+                $query->withCount('students');
+            }])
+            ->latest()
+            ->get();
 
         $totalCourses = $myCourses->count();
-        $totalStudents = 0;
+
+        $totalStudents = $myCourses->sum(function($course) {
+            return $course->classroom ? $course->classroom->students_count : 0;
+        });
 
         return view('instructor.dashboard', compact('myCourses', 'totalCourses', 'totalStudents'));
     }

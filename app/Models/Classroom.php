@@ -15,6 +15,6 @@ class Classroom extends Model
 
     public function students()
     {
-        return $this->hasMany(User::class);
+        return $this->hasMany(User::class, 'classroom_id')->where('role', 'student');
     }
 }

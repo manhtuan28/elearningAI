@@ -2,7 +2,9 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-black text-2xl text-slate-800 leading-tight flex items-center gap-2">
-            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path></svg>
+            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"></path>
+            </svg>
             {{ __('Tổng quan') }}
         </h2>
     </x-slot>
@@ -11,9 +13,9 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-8">
 
             <div class="relative overflow-hidden bg-white/60 backdrop-blur-xl border border-white/40 shadow-xl sm:rounded-[2.5rem] p-8 lg:p-12">
-                
+
                 <div class="absolute top-0 right-0 -mr-20 -mt-20 w-80 h-80 bg-gradient-to-br from-blue-400/30 to-purple-400/30 rounded-full blur-3xl"></div>
-                
+
                 <div class="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                     <div>
                         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/50 border border-white/50 text-[10px] font-black uppercase tracking-widest text-blue-600 mb-4 shadow-sm">
@@ -27,7 +29,7 @@
                             Chào mừng quay trở lại. Hôm nay là <span class="text-slate-900 font-bold">{{ date('d/m/Y') }}</span>, chúc cậu một ngày làm việc hiệu quả.
                         </p>
                     </div>
-                    
+
                     <div class="hidden md:block relative group">
                         <div class="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full blur opacity-40 group-hover:opacity-60 transition duration-500"></div>
                         <div class="relative w-24 h-24 rounded-full bg-white p-1 shadow-2xl ring-4 ring-white/50">
@@ -40,54 +42,58 @@
             </div>
 
             @if(auth()->user()->isAdmin() || auth()->user()->isInstructor())
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    
-                    {{-- CARD ADMIN --}}
-                    @if(auth()->user()->isAdmin())
-                    <div class="group relative overflow-hidden rounded-[2rem] bg-slate-900 p-8 shadow-2xl hover:-translate-y-1 transition-all duration-300">
-                        <div class="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                        
-                        <div class="relative z-10">
-                            <div class="flex items-start justify-between">
-                                <div class="p-3 bg-white/10 rounded-2xl backdrop-blur-sm">
-                                    <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
-                                </div>
-                                <span class="bg-blue-500 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Admin</span>
-                            </div>
-                            
-                            <h3 class="mt-6 text-2xl font-black text-white">Quản Trị Hệ Thống</h3>
-                            <p class="mt-2 text-slate-400 text-sm">Trung tâm điều khiển user, khóa học và báo cáo.</p>
-                            
-                            <a href="{{ route('admin.dashboard') }}" class="mt-6 inline-flex items-center gap-2 text-blue-400 font-bold hover:text-white transition-colors group-hover:translate-x-2 duration-300">
-                                Truy cập ngay <span class="text-lg">&rarr;</span>
-                            </a>
-                        </div>
-                    </div>
-                    @endif
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                    {{-- CARD GIẢNG VIÊN --}}
-                    @if(auth()->user()->isInstructor())
-                    <div class="group relative overflow-hidden rounded-[2rem] bg-indigo-900 p-8 shadow-2xl hover:-translate-y-1 transition-all duration-300">
-                         <div class="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                {{-- CARD ADMIN --}}
+                @if(auth()->user()->isAdmin())
+                <div class="group relative overflow-hidden rounded-[2rem] bg-slate-900 p-8 shadow-2xl hover:-translate-y-1 transition-all duration-300">
+                    <div class="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
 
-                        <div class="relative z-10">
-                            <div class="flex items-start justify-between">
-                                <div class="p-3 bg-white/10 rounded-2xl backdrop-blur-sm">
-                                    <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
-                                </div>
-                                <span class="bg-purple-500 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Instructor</span>
+                    <div class="relative z-10">
+                        <div class="flex items-start justify-between">
+                            <div class="p-3 bg-white/10 rounded-2xl backdrop-blur-sm">
+                                <svg class="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+                                </svg>
                             </div>
-                            
-                            <h3 class="mt-6 text-2xl font-black text-white">Khu Vực Giảng Dạy</h3>
-                            <p class="mt-2 text-indigo-200 text-sm">Quản lý lớp học, bài giảng và học viên của bạn.</p>
-                            
-                            <a href="{{ route('instructor.dashboard') }}" class="mt-6 inline-flex items-center gap-2 text-purple-300 font-bold hover:text-white transition-colors group-hover:translate-x-2 duration-300">
-                                Soạn bài giảng <span class="text-lg">&rarr;</span>
-                            </a>
+                            <span class="bg-blue-500 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Admin</span>
                         </div>
+
+                        <h3 class="mt-6 text-2xl font-black text-white">Quản Trị Hệ Thống</h3>
+                        <p class="mt-2 text-slate-400 text-sm">Trung tâm điều khiển user, khóa học và báo cáo.</p>
+
+                        <a href="{{ route('admin.dashboard') }}" class="mt-6 inline-flex items-center gap-2 text-blue-400 font-bold hover:text-white transition-colors group-hover:translate-x-2 duration-300">
+                            Truy cập ngay <span class="text-lg">&rarr;</span>
+                        </a>
                     </div>
-                    @endif
                 </div>
+                @endif
+
+                {{-- CARD GIẢNG VIÊN --}}
+                @if(auth()->user()->isInstructor())
+                <div class="group relative overflow-hidden rounded-[2rem] bg-indigo-900 p-8 shadow-2xl hover:-translate-y-1 transition-all duration-300">
+                    <div class="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+                    <div class="relative z-10">
+                        <div class="flex items-start justify-between">
+                            <div class="p-3 bg-white/10 rounded-2xl backdrop-blur-sm">
+                                <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path>
+                                </svg>
+                            </div>
+                            <span class="bg-purple-500 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Instructor</span>
+                        </div>
+
+                        <h3 class="mt-6 text-2xl font-black text-white">Khu Vực Giảng Dạy</h3>
+                        <p class="mt-2 text-indigo-200 text-sm">Quản lý lớp học, bài giảng và học viên của bạn.</p>
+
+                        <a href="{{ route('instructor.dashboard') }}" class="mt-6 inline-flex items-center gap-2 text-purple-300 font-bold hover:text-white transition-colors group-hover:translate-x-2 duration-300">
+                            Soạn bài giảng <span class="text-lg">&rarr;</span>
+                        </a>
+                    </div>
+                </div>
+                @endif
+            </div>
             @endif
 
             <div>
@@ -100,46 +106,52 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    
+
                     @if(isset($activeCourses) && count($activeCourses) > 0)
-                        @foreach($activeCourses as $course)
-                        <div class="bg-white/80 backdrop-blur-md rounded-[2rem] p-5 shadow-lg shadow-slate-200/50 border border-white hover:shadow-xl hover:scale-[1.02] transition-all duration-300 cursor-pointer flex flex-col h-full">
-                            <div class="h-40 bg-slate-200 rounded-2xl mb-4 overflow-hidden relative group shrink-0">
-                                @if($course->image)
-                                    <img src="{{ asset('storage/' . $course->image) }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
-                                @else
-                                    <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-100 text-blue-500 font-black text-4xl">
-                                        {{ substr($course->title, 0, 1) }}
-                                    </div>
-                                @endif
-                                <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors"></div>
+                    @foreach($activeCourses as $course)
+                    <div class="bg-white/80 backdrop-blur-md rounded-[2rem] p-5 shadow-lg shadow-slate-200/50 border border-white hover:shadow-xl hover:scale-[1.02] transition-all duration-300 cursor-pointer flex flex-col h-full">
+                        <div class="h-40 bg-slate-200 rounded-2xl mb-4 overflow-hidden relative group shrink-0">
+                            @if($course->image)
+                            <img src="{{ asset('storage/' . $course->image) }}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                            @else
+                            <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-100 text-blue-500 font-black text-4xl">
+                                {{ substr($course->title, 0, 1) }}
                             </div>
-                            
-                            <div class="flex flex-col flex-1">
-                                <div class="mb-3">
-                                    <span class="text-[10px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
-                                        {{ $course->code ?? 'Học phần' }}
-                                    </span>
-                                </div>
-                                
-                                <h4 class="font-bold text-lg text-slate-800 leading-snug line-clamp-2 mb-2">{{ $course->title }}</h4>
-                                
-                                <div class="mt-auto pt-4 flex items-center justify-between border-t border-slate-100">
-                                    <div class="flex items-center gap-2">
-                                        <div class="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center text-[10px] font-bold text-purple-600">
-                                            {{ substr($course->user->name ?? 'G', 0, 1) }}
-                                        </div>
-                                        <span class="text-xs font-bold text-slate-500 truncate max-w-[100px]">{{ $course->user->name ?? 'Giảng viên' }}</span>
+                            @endif
+                            <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors"></div>
+                        </div>
+
+                        <div class="flex flex-col flex-1">
+                            <div class="mb-3">
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-3 py-1 rounded-full border border-blue-100">
+                                    {{ $course->code ?? 'Học phần' }}
+                                </span>
+                            </div>
+
+                            <h4 class="font-bold text-lg text-slate-800 leading-snug line-clamp-2 mb-2">{{ $course->title }}</h4>
+
+                            <div class="mt-auto pt-4 flex items-center justify-between border-t border-slate-100">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center text-[10px] font-bold text-purple-600">
+                                        {{ substr($course->user->name ?? 'G', 0, 1) }}
                                     </div>
-                                    <button class="text-xs font-black text-blue-600 hover:underline">Vào học -></button>
+                                    <span class="text-xs font-bold text-slate-500 truncate max-w-[100px]">{{ $course->user->name ?? 'Giảng viên' }}</span>
                                 </div>
+
+                                <a href="{{ route('learning.course', $course->id) }}" class="text-xs font-black text-blue-600 hover:text-blue-800 hover:underline transition flex items-center gap-1">
+                                    Vào học
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                                    </svg>
+                                </a>
                             </div>
                         </div>
-                        @endforeach
+                    </div>
+                    @endforeach
                     @else
-                        <div class="col-span-3 py-10 text-center text-slate-400">
-                            <p class="font-bold">Hiện chưa có học phần nào đang mở.</p>
-                        </div>
+                    <div class="col-span-3 py-10 text-center text-slate-400">
+                        <p class="font-bold">Hiện chưa có học phần nào đang mở.</p>
+                    </div>
                     @endif
                 </div>
             </div>

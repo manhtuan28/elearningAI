@@ -9,10 +9,19 @@ class Lesson extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['course_id', 'title', 'content', 'order']; 
-
-    public function course()
+    protected $fillable = [
+        'chapter_id',
+        'title',
+        'slug',
+        'type',
+        'video_url',
+        'file_path',
+        'content',
+        'duration',
+        'sort_order'
+    ];
+    public function chapter()
     {
-        return $this->belongsTo(Course::class);
+        return $this->belongsTo(Chapter::class);
     }
 }

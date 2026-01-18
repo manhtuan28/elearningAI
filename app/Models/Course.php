@@ -30,4 +30,8 @@ class Course extends Model
     {
         return $this->belongsTo(Classroom::class);
     }
+    public function chapters()
+    {
+        return $this->hasMany(Chapter::class)->orderBy('sort_order');
+    }
 }

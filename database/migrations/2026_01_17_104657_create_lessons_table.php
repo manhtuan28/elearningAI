@@ -13,10 +13,17 @@ return new class extends Migration
     {
         Schema::create('lessons', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('course_id')->constrained('courses')->onDelete('cascade');
+            
+            $table->foreignId('chapter_id')->constrained('chapters')->onDelete('cascade');
+            
             $table->string('title');
-            $table->text('content');
-            $table->integer('order')->default(0);
+            $table->string('slug')->nullable();
+            $table->enum('type', ['video', 'text', 'quiz'])->default('video'); 
+            $table->string('video_url')->nullable();
+            $table->longText('content')->nullable();
+            $table->integer('duration')->default(0);
+            $table->integer('sort_order')->default(0);
+            
             $table->timestamps();
         });
     }
