@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\CourseController as AdminCourseController;
 use App\Http\Controllers\Instructor\DashboardController as InstructorDashboardController;
 use Illuminate\Support\Facades\Route;
@@ -13,24 +14,21 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', function () {
-        $activeCourses = \App\Models\Course::with('user')
-            ->where('status', 'open')
-            ->latest()
-            ->take(5)
-            ->get();
 
-        return view('dashboard', compact('activeCourses'));
-    })->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
+    Route::get('/courses/{id}/detail', [\App\Http\Controllers\LearningController::class, 'detail'])
+        ->name('learning.detail');
+
     Route::get('/learning/{id}/{lesson_id?}', [\App\Http\Controllers\LearningController::class, 'show'])
         ->name('learning.course');
 });
 
+// --- KHU VỰC ADMIN ---
 Route::middleware(['auth', CheckAdmin::class])->prefix('admin')->name('admin.')->group(function () {
 
     Route::get('/', [AdminCourseController::class, 'dashboard'])->name('dashboard');
@@ -59,6 +57,7 @@ Route::middleware(['auth', CheckAdmin::class])->prefix('admin')->name('admin.')-
     });
 });
 
+// --- KHU VỰC GIẢNG VIÊN ---
 Route::middleware(['auth', CheckInstructor::class])->prefix('instructor')->name('instructor.')->group(function () {
     Route::get('/', [InstructorDashboardController::class, 'index'])->name('dashboard');
 

@@ -10,7 +10,7 @@ class LearningController extends Controller
 {
     public function show($id, $lessonId = null)
     {
-        $course = Course::with(['chapters.lessons' => function($q) {
+        $course = Course::with(['chapters.lessons' => function ($q) {
             $q->orderBy('sort_order');
         }])->findOrFail($id);
 
@@ -23,5 +23,13 @@ class LearningController extends Controller
         }
 
         return view('learning.course', compact('course', 'activeLesson'));
+    }
+
+    public function detail($id)
+    {
+        $course = \App\Models\Course::with(['user', 'classroom', 'chapters.lessons'])
+            ->findOrFail($id);
+
+        return view('learning.detail', compact('course'));
     }
 }

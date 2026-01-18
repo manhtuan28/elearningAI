@@ -15,7 +15,7 @@ class CourseContentController extends Controller
     public function index($id)
     {
         $course = Course::where('id', $id)->where('user_id', auth()->id())
-            ->with(['chapters.lessons' => function($q) {
+            ->with(['chapters.lessons' => function ($q) {
                 $q->orderBy('sort_order');
             }])->firstOrFail();
         return view('instructor.courses.manage', compact('course'));
@@ -25,7 +25,7 @@ class CourseContentController extends Controller
     {
         $request->validate(['title' => 'required']);
         $order = Chapter::where('course_id', $id)->max('sort_order') + 1;
-        
+
         Chapter::create([
             'course_id' => $id,
             'title' => $request->title,
@@ -37,7 +37,7 @@ class CourseContentController extends Controller
     public function updateChapter(Request $request, $id)
     {
         $chapter = Chapter::findOrFail($id);
-        if($chapter->course->user_id != auth()->id()) abort(403);
+        if ($chapter->course->user_id != auth()->id()) abort(403);
 
         $chapter->update(['title' => $request->title]);
         return back()->with('success', 'Đã cập nhật tên chương.');
@@ -46,17 +46,17 @@ class CourseContentController extends Controller
     public function destroyChapter($id)
     {
         $chapter = Chapter::findOrFail($id);
-        if($chapter->course->user_id != auth()->id()) abort(403);
+        if ($chapter->course->user_id != auth()->id()) abort(403);
 
-        foreach($chapter->lessons as $lesson) {
+        foreach ($chapter->lessons as $lesson) {
             if ($lesson->file_path) Storage::disk('public')->delete($lesson->file_path);
         }
-        
+
         $chapter->delete();
         return back()->with('success', 'Đã xóa chương và toàn bộ bài học.');
     }
 
-public function storeLesson(Request $request, $chapterId)
+    public function storeLesson(Request $request, $chapterId)
     {
         $request->validate([
             'title' => 'required',
@@ -68,35 +68,25 @@ public function storeLesson(Request $request, $chapterId)
             'title' => $request->title,
             'slug' => Str::slug($request->title) . '-' . time(),
             'type' => $request->type,
-            'sort_order' => Lesson::where('chapter_id', $chapterId)->max('sort_order') + 1,
+            'video_url' => $request->video_url,
             'duration' => $request->duration ?? 0,
+            'sort_order' => Lesson::where('chapter_id', $chapterId)->max('sort_order') + 1,
         ];
 
-        if ($request->type == 'video') {
-            $lessonData['video_url'] = $request->video_url;
-            if ($request->hasFile('video_file')) {
-                $lessonData['file_path'] = $request->file('video_file')->store('videos', 'public');
-            }
+        if ($request->hasFile('file_upload')) {
+            $folder = ($request->type == 'video') ? 'videos' : 'documents';
+            $lessonData['file_path'] = $request->file('file_upload')->store($folder, 'public');
         }
 
-        if ($request->type == 'document') {
-            $lessonData['content'] = $request->content_doc;
-            if ($request->hasFile('doc_file')) {
-                $lessonData['file_path'] = $request->file('doc_file')->store('documents', 'public');
-            }
-        }
-
-        if ($request->type == 'homework') {
-            $lessonData['content'] = $request->content_homework;
-        }
-
-        if ($request->type == 'quiz' && $request->has('quiz')) {
-            $lessonData['content'] = json_encode($request->quiz); 
+        if ($request->type == 'quiz') {
+            $lessonData['content'] = json_encode($request->quiz);
+        } else {
+            $lessonData['content'] = ($request->type == 'document') ? $request->content_doc : $request->content_homework;
         }
 
         Lesson::create($lessonData);
 
-        return back()->with('success', 'Đã thêm nội dung thành công!');
+        return response()->json(['message' => 'Đã thêm bài học thành công!']);
     }
 
     public function updateLesson(Request $request, $id)
@@ -112,47 +102,34 @@ public function storeLesson(Request $request, $chapterId)
             'title' => $request->title,
             'type' => $request->type,
             'duration' => $request->duration ?? 0,
-            'video_url' => $request->video_url ?? $lesson->video_url, 
+            'video_url' => $request->video_url ?? $lesson->video_url,
         ];
 
-        if ($request->hasFile('file')) {
+        if ($request->hasFile('file_upload')) {
             if ($lesson->file_path) {
                 Storage::disk('public')->delete($lesson->file_path);
             }
-            
-            $folder = match($request->type) {
-                'video' => 'videos',
-                'document' => 'documents',
-                'homework' => 'homeworks',
-                default => 'others'
-            };
-            
-            $data['file_path'] = $request->file('file')->store($folder, 'public');
+            $folder = ($request->type == 'video') ? 'videos' : 'documents';
+            $data['file_path'] = $request->file('file_upload')->store($folder, 'public');
         }
 
-        if ($request->type == 'document') {
-            $data['content'] = $request->content_doc;
-        } 
-        elseif ($request->type == 'homework') {
-            $data['content'] = $request->content_homework;
-        } 
-        elseif ($request->type == 'quiz') {
+        if ($request->type == 'quiz') {
             if ($request->has('quiz')) {
                 $data['content'] = json_encode($request->quiz);
             }
-        } 
-        else {
+        } else {
+            $data['content'] = ($request->type == 'document') ? $request->content_doc : $request->content_homework;
         }
 
         $lesson->update($data);
 
-        return back()->with('success', 'Đã cập nhật bài học thành công!');
+        return response()->json(['message' => 'Cập nhật bài học thành công!']);
     }
 
     public function destroyLesson($id)
     {
         $lesson = Lesson::findOrFail($id);
-        
+
         if ($lesson->file_path) {
             Storage::disk('public')->delete($lesson->file_path);
         }
