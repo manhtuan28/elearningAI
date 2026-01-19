@@ -34,6 +34,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/instructor/lessons/{lessonId}/submissions', [\App\Http\Controllers\Instructor\CourseContentController::class, 'viewSubmissions'])
         ->name('instructor.lessons.submissions');
+
+    Route::post('/user/heartbeat', [\App\Http\Controllers\ActivityController::class, 'heartbeat'])->name('user.heartbeat');
 });
 
 // --- KHU VỰC ADMIN ---

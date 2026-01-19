@@ -259,11 +259,13 @@
 
                             <div class="flex items-center gap-1 opacity-60 group-hover:opacity-100 transition-opacity">
                                 @if(in_array($lesson->type, ['quiz', 'homework']))
-                                
-                                <button @click="checkProgress({{ json_encode($lesson) }})" 
-                                        class="flex items-center gap-1 px-3 py-1.5 bg-teal-50 text-teal-600 rounded-lg border border-teal-100 hover:bg-teal-100 hover:border-teal-200 transition" 
-                                        title="Kiểm tra ai chưa nộp">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+
+                                <button @click="checkProgress({{ json_encode($lesson) }})"
+                                    class="flex items-center gap-1 px-3 py-1.5 bg-teal-50 text-teal-600 rounded-lg border border-teal-100 hover:bg-teal-100 hover:border-teal-200 transition"
+                                    title="Kiểm tra ai chưa nộp">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                                    </svg>
                                     <span class="text-[10px] font-black">Tiến độ</span>
                                 </button>
 
@@ -271,7 +273,8 @@
                                     class="flex items-center gap-1 px-3 py-1.5 bg-emerald-50 text-emerald-600 rounded-lg border border-emerald-100 hover:bg-emerald-100 hover:border-emerald-200 transition"
                                     title="Chấm bài chi tiết">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
                                     </svg>
                                     @if(isset($lesson->submissions) && $lesson->submissions->count() > 0)
                                     <span class="text-[10px] font-black">{{ $lesson->submissions->count() }}</span>
@@ -356,9 +359,11 @@
                     <h3 class="font-black text-lg text-slate-800 uppercase tracking-tight">Tiến độ nộp bài</h3>
                     <p class="text-xs font-bold text-slate-400 mt-1" x-text="selectedLesson?.title"></p>
                 </div>
-                <button @click="progressModalOpen = false" class="text-slate-400 hover:text-red-500 transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg></button>
+                <button @click="progressModalOpen = false" class="text-slate-400 hover:text-red-500 transition"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg></button>
             </div>
-            
+
             <div class="p-6 overflow-y-auto custom-scrollbar flex-1 bg-white">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="space-y-4">
@@ -368,10 +373,20 @@
                         <template x-for="sub in submittedList" :key="sub.id">
                             <div class="p-3 rounded-xl border border-emerald-100 bg-emerald-50/50 flex items-center justify-between">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-full bg-emerald-200 text-emerald-700 flex items-center justify-center font-bold text-xs" x-text="sub.name.charAt(0)"></div>
+                                    <div class="relative">
+                                        <div class="w-8 h-8 rounded-full bg-emerald-200 text-emerald-700 flex items-center justify-center font-bold text-xs" x-text="sub.name.charAt(0)"></div>
+
+                                        <span class="absolute bottom-0 right-0 w-2.5 h-2.5 border-2 border-white rounded-full"
+                                            :class="sub.is_online ? 'bg-green-500' : 'bg-slate-300'"></span>
+                                    </div>
+
                                     <div>
                                         <p class="font-bold text-sm text-slate-700" x-text="sub.name"></p>
-                                        <p class="text-[10px] text-slate-400" x-text="sub.email"></p>
+                                        <div class="flex items-center gap-2 text-[10px] text-slate-400">
+                                            <span x-text="sub.is_online ? 'Đang online' : (sub.last_seen ? 'Online ' + sub.last_seen : 'Chưa online')"></span>
+                                            <span>•</span>
+                                            <span x-text="'Đã học: ' + sub.learning_time"></span>
+                                        </div>
                                     </div>
                                 </div>
                                 <span class="text-xs font-bold text-emerald-600" x-text="sub.score != null ? sub.score + 'đ' : 'Đã nộp'"></span>
@@ -533,9 +548,17 @@
 </div>
 
 <script>
-    // Định nghĩa dữ liệu ra biến toàn cục để tránh lỗi cú pháp IDE khi dùng bên trong object
-    const _studentList = {!! json_encode($course->classroom ? $course->classroom->students : []) !!};
-
+const _studentList = {!! json_encode($course->classroom ? $course->classroom->students->map(function($s) {
+        return [
+            'id' => $s->id,
+            'name' => $s->name,
+            'email' => $s->email,
+            'is_online' => $s->isOnline(),
+            'last_seen' => $s->last_seen_at ? $s->last_seen_at->diffForHumans() : null,
+            'learning_time' => $s->learning_time
+        ];
+    }) : []) !!};
+    
     function manageApp() {
         return {
             importModalOpen: false,
@@ -557,7 +580,7 @@
             },
             file: null,
             questions: [],
-            
+
             // Dữ liệu cho tiến độ
             selectedLesson: null,
             students: _studentList, // Sử dụng biến đã định nghĩa ở trên
@@ -580,19 +603,22 @@
                 this.selectedLesson = lesson;
                 this.submittedList = [];
                 this.notSubmittedList = [];
-                
+
                 // An toàn: Kiểm tra nếu submissions tồn tại
                 const submittedUserIds = (lesson.submissions || []).map(s => s.user_id);
-                
+
                 this.students.forEach(student => {
                     if (submittedUserIds.includes(student.id)) {
                         const sub = lesson.submissions.find(s => s.user_id === student.id);
-                        this.submittedList.push({ ...student, score: sub.score });
+                        this.submittedList.push({
+                            ...student,
+                            score: sub.score
+                        });
                     } else {
                         this.notSubmittedList.push(student);
                     }
                 });
-                
+
                 this.progressModalOpen = true;
             },
 

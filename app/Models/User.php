@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\Cache;
 
 class User extends Authenticatable
 {
@@ -67,5 +68,19 @@ class User extends Authenticatable
     public function classroom()
     {
         return $this->belongsTo(Classroom::class);
+    }
+
+    public function isOnline()
+    {
+        return Cache::has('user-is-online-' . $this->id);
+    }
+
+    public function getLearningTimeAttribute()
+    {
+        $minutes = $this->total_learning_minutes;
+        if ($minutes < 60) return $minutes . ' phút';
+        $hours = floor($minutes / 60);
+        $min = $minutes % 60;
+        return $hours . ' giờ ' . $min . ' phút';
     }
 }

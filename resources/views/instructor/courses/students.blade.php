@@ -30,9 +30,8 @@
             <thead class="bg-slate-50/80 border-b border-slate-100">
                 <tr>
                     <th class="p-6 pl-8 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Thông tin sinh viên</th>
-                    <!-- <th class="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Mã sinh viên</th> -->
                     <th class="p-6 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Email liên hệ</th>
-                    <th class="p-6 pr-8 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 text-right">Trạng thái</th>
+                    <th class="p-6 pr-8 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 text-right">Trạng thái học tập</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-50">
@@ -40,25 +39,47 @@
                 <tr class="group hover:bg-slate-50/50 transition-colors duration-200">
                     <td class="p-6 pl-8">
                         <div class="flex items-center gap-4">
-                            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-black text-sm shadow-md shadow-indigo-200">
-                                {{ substr($student->name, 0, 1) }}
+                            <div class="relative">
+                                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center text-white font-black text-sm shadow-md shadow-indigo-200">
+                                    {{ substr($student->name, 0, 1) }}
+                                </div>
+                                {{-- Chấm xanh nếu Online, Xám nếu Offline --}}
+                                <span class="absolute bottom-0 right-0 w-3 h-3 border-2 border-white rounded-full {{ $student->isOnline() ? 'bg-emerald-500' : 'bg-slate-300' }}"></span>
                             </div>
+                            
                             <div>
                                 <p class="font-bold text-slate-800 text-sm group-hover:text-indigo-700 transition">{{ $student->name }}</p>
-                                <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Sinh viên</p>
+                                {{-- Hiển thị trạng thái text --}}
+                                <p class="text-[10px] font-bold uppercase tracking-wider mt-0.5">
+                                    @if($student->isOnline())
+                                        <span class="text-emerald-500">Đang hoạt động</span>
+                                    @else
+                                        <span class="text-slate-400">
+                                            {{ $student->last_seen_at ? 'Online ' . $student->last_seen_at->diffForHumans() : 'Chưa truy cập' }}
+                                        </span>
+                                    @endif
+                                </p>
                             </div>
                         </div>
                     </td>
-                    <!-- <td class="p-6">
-                        <span class="font-bold text-slate-600 bg-slate-100 px-3 py-1 rounded-lg text-xs">{{ $student->code ?? 'N/A' }}</span>
-                    </td> -->
+                    
                     <td class="p-6">
                         <span class="text-sm font-medium text-slate-500 italic">{{ $student->email }}</span>
                     </td>
+
                     <td class="p-6 pr-8 text-right">
-                        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-100 text-[10px] font-black uppercase tracking-wider">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Đang học
-                        </span>
+                        <div class="flex flex-col items-end gap-1">
+                            {{-- Badge Trạng thái --}}
+                            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-black uppercase tracking-wider {{ $student->isOnline() ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-slate-50 text-slate-500 border-slate-100' }}">
+                                <span class="w-1.5 h-1.5 rounded-full {{ $student->isOnline() ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400' }}"></span> 
+                                {{ $student->isOnline() ? 'Đang học' : 'Vắng mặt' }}
+                            </span>
+                            
+                            {{-- Tổng thời gian học --}}
+                            <span class="text-[10px] font-bold text-slate-400 mt-1">
+                                Thời gian tích lũy: <span class="text-slate-700">{{ $student->learning_time }}</span>
+                            </span>
+                        </div>
                     </td>
                 </tr>
                 @endforeach
