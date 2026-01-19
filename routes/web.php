@@ -28,9 +28,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/learning/{id}/{lesson_id?}', [LearningController::class, 'show'])
         ->name('learning.course');
-
     Route::post('/learning/lessons/{lessonId}/submit', [LearningController::class, 'submitLesson'])
         ->name('learning.lesson.submit');
+    Route::post('/learning/video/{id}/progress', [\App\Http\Controllers\LearningController::class, 'updateVideoProgress']);
+
 
     Route::get('/instructor/lessons/{lessonId}/submissions', [\App\Http\Controllers\Instructor\CourseContentController::class, 'viewSubmissions'])
         ->name('instructor.lessons.submissions');

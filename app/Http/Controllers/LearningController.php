@@ -12,7 +12,9 @@ class LearningController extends Controller
 {
     public function show($id, $lessonId = null)
     {
-        $course = Course::with(['chapters.lessons' => function ($q) {
+        $course = Course::with(['chapters' => function ($q) {
+            $q->orderBy('sort_order');
+        }, 'chapters.lessons' => function ($q) {
             $q->orderBy('sort_order');
         }])->findOrFail($id);
 
@@ -20,8 +22,7 @@ class LearningController extends Controller
             $activeLesson = Lesson::whereIn('chapter_id', $course->chapters->pluck('id'))
                 ->findOrFail($lessonId);
         } else {
-            $firstChapter = $course->chapters->sortBy('sort_order')->first();
-            $activeLesson = $firstChapter ? $firstChapter->lessons->sortBy('sort_order')->first() : null;
+            $activeLesson = $course->chapters->flatMap->lessons->first();
         }
 
         $submission = null;
@@ -32,9 +33,17 @@ class LearningController extends Controller
                 ->first();
         }
 
-        return view('learning.course', compact('course', 'activeLesson', 'submission'));
-    }
+        $allLessonIds = $course->chapters->flatMap->lessons->pluck('id');
+        $totalLessons = $allLessonIds->count();
+        $completedCount = LessonSubmission::where('user_id', auth()->id())
+            ->whereIn('lesson_id', $allLessonIds)
+            ->where('status', 'completed')
+            ->count();
 
+        $progressPercent = $totalLessons > 0 ? round(($completedCount / $totalLessons) * 100) : 0;
+
+        return view('learning.course', compact('course', 'activeLesson', 'submission', 'progressPercent'));
+    }
     public function detail($id)
     {
         $course = Course::with(['user', 'classroom', 'chapters.lessons'])
@@ -134,5 +143,35 @@ class LearningController extends Controller
                 ];
             })
         ]);
+    }
+
+    public function updateVideoProgress(Request $request, $lessonId)
+    {
+        $userId = auth()->id();
+        $currentTime = $request->input('current_time', 0);
+        $isCompleted = $request->input('is_completed', false);
+
+        $submission = LessonSubmission::firstOrCreate(
+            ['user_id' => $userId, 'lesson_id' => $lessonId],
+            [
+                'submission_content' => 'video_watching',
+                'score' => null,
+                'status' => 'started',
+                'attempt_count' => 1
+            ]
+        );
+
+        if ($currentTime > $submission->video_progress) {
+            $submission->video_progress = $currentTime;
+        }
+
+        if ($isCompleted && $submission->status != 'completed') {
+            $submission->status = 'completed';
+            $submission->score = 10;
+        }
+
+        $submission->save();
+
+        return response()->json(['status' => 'success']);
     }
 }
