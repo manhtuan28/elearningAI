@@ -5,12 +5,14 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Course;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
     public function index()
     {
         $user = Auth::user();
+        $userId = Auth::id();
         
         $activeCourses = Course::where('status', 'open')
             ->where(function($query) use ($user) {
@@ -21,6 +23,10 @@ class DashboardController extends Controller
             ->latest()
             ->get();
 
-        return view('dashboard', compact('activeCourses'));
+        $aiAnalysis = DB::table('student_predictions')
+            ->where('user_id', $userId)
+            ->first();
+
+        return view('dashboard', compact('activeCourses', 'aiAnalysis'));
     }
 }

@@ -39,6 +39,78 @@
                 </div>
             </div>
 
+
+            <div class="py-12">
+                <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
+                    @if(isset($aiAnalysis))
+                    @php
+                    $colorMap = ['Low' => 'emerald', 'Medium' => 'yellow', 'High' => 'red'];
+                    $color = $colorMap[$aiAnalysis->risk_level] ?? 'blue';
+
+                    $icon = match($aiAnalysis->risk_level) {
+                    'Low' => '🏆', 'Medium' => '📈', 'High' => '🚑', default => '🤖'
+                    };
+
+                    // Tách câu khuyến nghị để style riêng (nếu có dấu :)
+                    $parts = explode(':', $aiAnalysis->ai_recommendation, 2);
+                    $title_rec = count($parts) > 1 ? $parts[0] : 'Lời khuyên từ AI';
+                    $content_rec = count($parts) > 1 ? $parts[1] : $aiAnalysis->ai_recommendation;
+                    @endphp
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                        <div class="lg:col-span-1 bg-white overflow-hidden shadow-lg sm:rounded-xl border-t-4 border-{{ $color }}-500 relative">
+                            <div class="absolute top-0 right-0 p-4 opacity-10 text-9xl font-black select-none">{{ $icon }}</div>
+
+                            <div class="p-6 relative z-10">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <span class="bg-{{ $color }}-100 text-{{ $color }}-700 text-xs font-bold px-2 py-1 rounded uppercase">AI Mentor V3</span>
+                                    <span class="text-xs text-gray-400 font-semibold">{{ date('d/m/Y H:i') }}</span>
+                                </div>
+
+                                <h2 class="text-3xl font-black text-slate-800 mb-1 leading-none">
+                                    @if($aiAnalysis->risk_level == 'Low' && $aiAnalysis->avg_score >= 8) CHIẾN THẦN HỌC TẬP
+                                    @elseif($aiAnalysis->risk_level == 'High') CẢNH BÁO RỦI RO
+                                    @else {{ $aiAnalysis->risk_level == 'Medium' ? 'TIỀM NĂNG LỚN' : 'HỌC VIÊN MỚI' }} @endif
+                                </h2>
+                                <p class="text-sm font-bold text-{{ $color }}-600 uppercase tracking-widest mb-6">Phân loại năng lực</p>
+
+                                <div class="bg-{{ $color }}-50 rounded-lg p-4 border border-{{ $color }}-100 mb-6">
+                                    <h4 class="flex items-center gap-2 text-{{ $color }}-800 font-bold text-sm uppercase mb-1">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                        </svg>
+                                        {{ $title_rec }}
+                                    </h4>
+                                    <p class="text-slate-700 font-medium text-sm leading-relaxed">
+                                        "{{ $content_rec }}"
+                                    </p>
+                                </div>
+
+                                <div class="grid grid-cols-3 gap-2 text-center border-t border-gray-100 pt-4">
+                                    <div>
+                                        <div class="text-xs text-gray-400 font-bold uppercase">Điểm TB</div>
+                                        <div class="text-xl font-black text-slate-700">{{ number_format($aiAnalysis->avg_score, 1) }}</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs text-gray-400 font-bold uppercase">Tiến độ</div>
+                                        <div class="text-xl font-black text-slate-700">{{ number_format($aiAnalysis->completion_rate, 0) }}%</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-xs text-gray-400 font-bold uppercase">Chuyên cần</div>
+                                        <div class="text-xl font-black text-slate-700">{{ $aiAnalysis->login_count }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="lg:col-span-2 bg-white shadow-lg sm:rounded-xl p-2 border border-slate-100 flex items-center justify-center bg-slate-50">
+                            <img src="{{ asset('ai_analysis_chart.png') }}?v={{ time() }}" class="max-h-80 rounded shadow-sm">
+                        </div>
+                    </div>
+                    @endif
+                </div>
+            </div>
+
             @if(auth()->user()->isAdmin() || auth()->user()->isInstructor())
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {{-- CARD ADMIN --}}
